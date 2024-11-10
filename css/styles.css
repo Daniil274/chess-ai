@@ -1,0 +1,265 @@
+body {
+    background-color: #212121;
+    color: #ffffff;
+    min-height: 100vh;
+}
+
+/* Сайдбар */
+.sidebar {
+    background-color: #171717;
+    height: 100vh;
+    position: fixed;
+    left: -300px; /* Начальная позиция за пределами экрана */
+    top: 0;
+    width: 300px;
+    padding: 20px;
+    overflow-y: auto;
+    z-index: 1000;
+    transition: left 0.3s ease; /* Анимация */
+}
+
+.sidebar.open {
+    left: 0; /* Показываем сайдбар */
+}
+
+/* Кнопка открытия сайдбара */
+#out-btn-container {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+}
+
+.sidebar-toggle {
+    background: #2d2d2d;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+    background-color: #3d3d3d;
+}
+
+/* Кнопка закрытия сайдбара */
+.sidebar-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.sidebar-close:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Контейнер контента */
+.container {
+    transition: margin-left 0.3s ease;
+    margin-left: 0;
+    padding: 20px;
+}
+
+.container.sidebar-open {
+    margin-left: 300px;
+}
+
+/* Шахматная доска */
+#chessboard-container {
+    flex: 0 0 auto; /* Предотвращаем сжатие/растяжение */
+    min-width: 500px;
+    max-width: 600px;
+    margin: 0 auto;
+    position: sticky;
+    top: 20px; /* Отступ сверху */
+}
+
+#chessboard {
+    width: 100%;
+    aspect-ratio: 1;
+}
+
+.history-container {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 20px;
+    border-radius: 4px;
+    background: #2d2d2d;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.history-table th,
+.history-table td {
+    padding: 8px;
+    text-align: center;
+    border: 1px solid #3d3d3d;
+}
+
+.history-table tr:nth-child(even) {
+    background: #333;
+}
+
+#controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex: 0 0 auto; /* Предотвращаем сжатие */
+}
+
+#history {
+    background-color: #1a1a1a;
+    border-radius: 8px;
+    padding: 15px;
+    flex: 1;
+    overflow-y: auto;
+}
+/* Таблица истории ходов */
+.table {
+    color: #ffffff;
+    border-color: #333333;
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background-color: #2a2a2a;
+    color: #d3d3d3;
+    font-weight: bold;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.table tbody td {
+    text-align: center;
+    vertical-align: middle;
+    border-color: #444444;
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: #2a2a2a;
+}
+
+.table tbody tr:hover {
+    background-color: #3a3a3a;
+}
+/* Кнопка открытия сайдбара */
+#out-btn-container {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+}
+
+/* Стили для AI списка */
+#aiList .list-group-item {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#aiList .list-group-item.active-ai {
+    background-color: #6c757d !important;
+    font-weight: bold;
+    color: #ffcc00;
+}
+
+/* Подписи игроков */
+#playerWhite, #playerBlack {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #d3d3d3;
+    margin: 10px 0;
+}
+
+@media (max-width: 991px) {
+    .container {
+        padding: 10px;
+        height: auto;
+        overflow: visible;
+    }
+
+    #chessboard-container {
+        position: relative;
+        top: 0;
+        margin-bottom: 20px;
+    }
+
+    #history-container {
+        width: 100%;
+        max-width: 600px;
+        height: 400px; /* Фиксированная высота на мобильных */
+    }
+}
+
+@media (min-width: 992px) {
+    .container > .d-flex {
+        gap: 30px;
+        height: 100%;
+    }
+}
+
+/* Обновляем стили для основного flex-контейнера */
+.container .d-flex {
+    align-items: flex-start;
+    height: 100%;
+    overflow-y: auto; /* Добавляем прокрутку здесь */
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1e1e1e;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #4a4a4a;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+.player-select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    background: #2d2d2d;
+    border: 1px solid #3d3d3d;
+    color: #fff;
+    border-radius: 4px;
+}
+
+.depth-control {
+    width: 100%;
+    margin: 10px 0;
+}
+
+/* Стилизация истории матчей */
+.match-history {
+    margin-top: 20px;
+}
+
+.match-history-item {
+    padding: 10px;
+    margin-bottom: 10px;
+    background: #2d2d2d;
+    border-radius: 4px;
+}

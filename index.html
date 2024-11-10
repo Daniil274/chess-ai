@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess AI Web App</title>
+    <!-- Подключаем стили chessboard.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard.js/1.0.0/chessboard-1.0.0.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/chessboard-1.0.0.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <body class=" text-white">
+        <div id="out-btn-container">
+            <button id="openSidebarBtn" class="sidebar-toggle">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M3 8C3 7.44772 3.44772 7 4 7H20C20.5523 7 21 7.44772 21 8C21 8.55228 20.5523 9 20 9H4C3.44772 9 3 8.55228 3 8ZM3 16C3 15.4477 3.44772 15 4 15H14C14.5523 15 15 15.4477 15 16C15 16.5523 14.5523 17 14 17H4C3.44772 17 3 16.5523 3 16Z" fill="currentColor"/>
+                </svg>
+            </button>
+        </div>
+    
+        <div class="d-flex">
+            <div id="sidebar" class="sidebar">
+                <button id="closeSidebarBtn" class="sidebar-close">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z" fill="currentColor"/>
+                    </svg>
+                </button>
+
+                <h5 class="mt-4">Игроки</h5>
+                <div class="form-group">
+                    <label for="whitePlayer">Белые:</label>
+                    <select id="whitePlayer" class="form-control bg-dark text-white">
+                        <option value="human">Человек</option>
+                        <option value="stockfish">Stockfish</option>
+                        <option value="gpt">GPT-4</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="blackPlayer">Черные:</label>
+                    <select id="blackPlayer" class="form-control bg-dark text-white">
+                        <option value="stockfish">Stockfish</option>
+                        <option value="human">Человек</option>
+                        <option value="gpt">GPT-4</option>
+                    </select>
+                </div>
+                <div id="depthSettings" class="mt-4" style="display: none;">
+                    <h5>Настройки Stockfish</h5>
+                    <div class="form-group">
+                        <label for="engineDepth">Глубина расчета:</label>
+                        <div class="d-flex align-items-center">
+                            <input type="range" class="form-control-range flex-grow-1" 
+                                   id="engineDepth" min="1" max="20" value="15">
+                            <span id="depthValue" class="ml-2">15</span>
+                        </div>
+                    </div>
+                </div>
+                <h5 class="mt-4">История матчей</h5>
+                <div class="list-group" style="max-height: 300px; overflow-y: auto;">
+                    <!-- История матчей будет добавляться сюда динамически -->
+                </div>
+            </div>
+        
+            <div class="container d-flex flex-column flex-lg-row align-items-center align-items-lg-start p-3">
+                <div id="chessboard-container">
+                    <!-- Подпись игрока сверху -->
+                    <div class="text-center mb-2">
+                        <h6 id="playerBlack" class="text-white">Игрок: Stockfish (Черные)</h6>
+                    </div>
+                    
+                    <!-- Доска -->
+                    <div id="chessboard" class="my-3"></div>
+            
+                    <!-- Подпись игрока снизу -->
+                    <div class="text-center mt-2">
+                        <h6 id="playerWhite" class="text-white">Игрок: Пользователь (Белые)</h6>
+                    </div>
+                </div>
+            
+                <!-- История ходов -->
+                <div id="history-container" class="mt-3 mt-lg-0">
+                    <!-- Кнопки управления -->
+                    <div id="controls">
+                        <button id="restartBtn" class="btn btn-danger">Рестарт</button>
+                        <button id="flipBoardBtn" class="btn btn-secondary">Перевернуть</button>
+                        <button id="playPauseBtn" class="btn btn-primary">Старт</button>
+                    </div>
+                    
+                    <!-- История ходов -->
+                    <div id="history" class="rounded">
+                        <table class="table table-sm table-dark table-striped table-bordered">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th scope="col" class="text-center">#</th>
+                                    <th scope="col" class="text-center">Белые</th>
+                                    <th scope="col" class="text-center">Черные</th>
+                                </tr>
+                            </thead>
+                            <tbody id="moveHistory">
+                                <!-- Ходы будут добавляться сюда через JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+        
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script src="js/chessboard-1.0.0.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
+        <script src="js/stockfish/stockfish.js"></script>
+    
+        <!-- Добавляем type="module" для main.js -->
+        <script type="module" src="js/main.js"></script>
+</body>
+</html>
