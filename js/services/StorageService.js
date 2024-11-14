@@ -5,10 +5,8 @@ export class StorageService {
 
     save(key, data) {
         try {
-            localStorage.setItem(
-                this.prefix + key, 
-                JSON.stringify(data)
-            );
+            const serializedData = JSON.stringify(data);
+            localStorage.setItem(this.prefix + key, serializedData);
             return true;
         } catch (error) {
             console.error('Storage save error:', error);
@@ -27,20 +25,24 @@ export class StorageService {
     }
 
     remove(key) {
-        localStorage.removeItem(this.prefix + key);
+        try {
+            localStorage.removeItem(this.prefix + key);
+            return true;
+        } catch (error) {
+            console.error('Storage remove error:', error);
+            return false;
+        }
     }
 
-    saveMatch(match) {
-        const matches = this.load('matches') || [];
-        matches.unshift(match);
-        this.save('matches', matches.slice(0, config.maxStoredGames));
-    }
-
-    loadCurrentGame() {
-        return this.load('currentGame');
-    }
-
-    saveCurrentGame(gameState) {
-        this.save('currentGame', gameState);
+    clear() {
+        try {
+            Object.keys(localStorage)
+                .filter(key => key.startsWith(this.prefix))
+                .forEach(key => localStorage.removeItem(key));
+            return true;
+        } catch (error) {
+            console.error('Storage clear error:', error);
+            return false;
+        }
     }
 }

@@ -5,17 +5,22 @@ export class BoardUI {
         this.container = document.getElementById(containerId);
         this.config = config;
         this.board = null;
-        this.onMove = null; // Callback для хода
+        this.onMove = null;
+        this.game = null;
+        this.orientation = 'white'; // Добавляем отслеживание ориентации
     }
 
-    initialize() {
+    initialize(gameInstance) {
+        this.game = gameInstance;
+        
         const boardConfig = {
             ...this.config,
             draggable: true,
             onDragStart: this.handleDragStart.bind(this),
             onDrop: this.handleDrop.bind(this),
             onSnapEnd: this.handleSnapEnd.bind(this),
-            position: 'start'
+            position: 'start',
+            orientation: this.orientation
         };
 
         this.board = Chessboard(this.container.id, boardConfig);
@@ -23,24 +28,27 @@ export class BoardUI {
     }
 
     handleDragStart(source, piece, position, orientation) {
-        // Проверяем, что двигается фигура правильного цвета
-        const currentTurn = piece.charAt(0); // 'w' или 'b'
-        const isWhiteTurn = currentTurn === 'w';
-        const isCorrectOrientation = (orientation === 'white' && isWhiteTurn) || 
-                                    (orientation === 'black' && !isWhiteTurn);
+        if (!this.game) return false;
+
+        const currentTurn = piece.charAt(0);
         
-        return isCorrectOrientation;
+        if (this.game.game_over() || 
+            currentTurn !== this.game.turn()) {
+            return false;
+        }
+        
+        return true;
     }
     
     handleDrop(source, target) {
-        // Проверяем валидность хода
+        if (!source || !target) return 'snapback';
+
         const move = {
             from: source,
             to: target,
             promotion: 'q'
         };
     
-        // Если ход невозможен, возвращаем 'snapback'
         if (!this.isValidMove(source, target)) {
             return 'snapback';
         }
@@ -51,19 +59,28 @@ export class BoardUI {
     }
     
     isValidMove(source, target) {
-        // Базовые проверки
+        if (!this.game) return false;
         if (source === target) return false;
         if (!source || !target) return false;
         
-        // Дополнительные проверки можно добавить здесь
-        return true;
+        const move = {
+            from: source,
+            to: target,
+            promotion: 'q'
+        };
+        
+        const possibleMoves = this.game.moves({ verbose: true });
+        return possibleMoves.some(m => 
+            m.from === move.from && 
+            m.to === move.to
+        );
     }
 
     setMoveCallback(callback) {
         this.onMove = callback;
     }
 
-    handleSnapEnd(source, target, piece) {
+    handleSnapEnd() {
         // Вызывается после завершения анимации хода
     }
 
@@ -73,23 +90,55 @@ export class BoardUI {
         }
     }
 
+    // Добавляем метод получения текущей ориентации
+    getOrientation() {
+        return this.orientation;
+    }
+
+    // Обновляем метод flip
     flip() {
         if (this.board) {
+            this.orientation = this.orientation === 'white' ? 'black' : 'white';
             this.board.flip();
         }
     }
 
-    // Метод для очистки доски
+    // Метод для установки ориентации
+    setOrientation(orientation) {
+        if (this.board && (orientation === 'white' || orientation === 'black')) {
+            this.orientation = orientation;
+            this.board.orientation(orientation);
+        }
+    }
+
     clear() {
         if (this.board) {
             this.board.clear();
         }
     }
 
-    // Метод для уничтожения доски
     destroy() {
         if (this.board) {
             this.board.destroy();
+            window.removeEventListener('resize', this.board.resize);
+        }
+    }
+
+    // Метод для проверки готовности доски
+    isReady() {
+        return !!this.board;
+    }
+
+    // Метод для обновления конфигурации
+    updateConfig(newConfig) {
+        this.config = {
+            ...this.config,
+            ...newConfig
+        };
+        
+        if (this.board) {
+            this.board.destroy();
+            this.initialize(this.game);
         }
     }
 }

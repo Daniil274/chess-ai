@@ -3,18 +3,19 @@ import { HumanPlayer } from '../models/Player.js';
 
 export class AIFactory {
     static create(type, color) {
-        // Нормализуем тип (приводим к нижнему регистру и убираем 'player', 'ai')
+        // Нормализуем тип (приводим к нижнему регистру и убираем лишние слова)
         const cleanType = type.toLowerCase()
             .replace('player', '')
-            .replace('ai', '');
+            .replace('ai', '')
+            .replace('stockfish', 'stockfish')
+            .trim();
         
         switch (cleanType) {
             case 'stockfish':
+            case 'stockfishai':
                 return new StockfishAI(color);
             case 'human':
-                return new HumanPlayer(color);
             default:
-                console.warn(`Unknown AI type: ${type}, defaulting to human`);
                 return new HumanPlayer(color);
         }
     }
